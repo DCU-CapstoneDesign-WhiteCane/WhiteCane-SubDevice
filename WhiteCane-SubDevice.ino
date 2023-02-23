@@ -2,6 +2,8 @@
 #define LED 5  // LED 핀번호 지정
 #define CDS A1 // 조도센서 핀번호 지정
 
+int detection_flag = 0; // 장애물 감지 Flag
+
 void setup() {
   Serial.begin(9600);    // Serial open
 
@@ -11,18 +13,28 @@ void setup() {
 
 void loop() {
   obstacle_detection();  // 장애물 감지
-  led_control();
+  led_control(); // LED 제어
 }
 
-void obstacle_detection() { // 적외선 센서를 통해 장애물 감지 Check
+// 적외선 센서를 통해 장애물 감지 확인
+void obstacle_detection() {
   int ir = digitalRead(IR);
 
-  if (ir == 0) {
-    Serial.println("Obstacle Detection");
+  if (ir == 0) { // 장애물이 감지되었을 때
+    if (detection_flag == 0) {
+      detection_flag = 1;
+      Serial.println("Obstacle Detection");
+    }
+  } else { // 장애물이 감지되지 않었을 때
+    if (detection_flag == 1) {
+      detection_flag = 0;
+      Serial.println("Obstacle not detected");
+    }
   }
 }
 
-void led_control() { // 주변 밝기에 따라 LED ON/OFF 제어
+// 주변 밝기에 따라 LED ON/OFF 제어
+void led_control() {
   int cds = analogRead(CDS);
 
   if (cds >= 500) {
