@@ -1,5 +1,6 @@
 #include <SPI.h>
 #include <MFRC522.h>
+#include <SoftwareSerial.h>
 
 #define CDS A1 // 조도센서 핀번호 지정
 #define IR 4   // 적외선 센서 핀번호 지정
@@ -7,7 +8,8 @@
 #define RST 9  // RFID RST 핀번호 지정
 #define SDA 10 // RFID SDA 핀번호 지정
 
-MFRC522 mfrc522(SDA, RST); // MFRC522 객체 생성
+SoftwareSerial mySerial(2, 3) // RX, TX
+MFRC522 mfrc522(SDA, RST);    // MFRC522 객체 생성
 
 int detection_flag = 0; // 장애물 감지 Flag
 
