@@ -15,6 +15,7 @@ int detection_flag = 0; // 장애물 감지 Flag
 
 void setup() {
   Serial.begin(9600);    // Initialize serial communications with the PC
+  mySerial.begin(9600);    // Initialize serial communications with the Main Device
   SPI.begin();           // Init SPI bus
   mfrc522.PCD_Init();    // Init MRFC522 card
   pinMode(IR, INPUT);    // 적외선 센서 INPUT 설정
