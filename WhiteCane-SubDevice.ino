@@ -1,6 +1,7 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include <SoftwareSerial.h>
+#include <ArduinoJson.h>
 
 #define CDS A1 // 조도센서 핀번호 지정
 #define IR 4   // 적외선 센서 핀번호 지정
@@ -58,6 +59,8 @@ void led_control() {
 
 // RFID TAG 읽기
 void rfid_reader() {
+  StaticJsonDocument<64> doc;   // JSON 객체 생성
+
   // 키 준비 (초기 세팅은 FFFFFFFFFFFFh로 되어 있음)
   MFRC522::MIFARE_Key key;
   for (byte i = 0; i < 6; i++) {
@@ -104,8 +107,13 @@ void rfid_reader() {
     } else {
       buffer[i] = '\0';
       buffer_str = String((char*)buffer);
+
       Serial.print("Location : ");
       Serial.println(buffer_str);
+
+      // JSON 데이터 메인 디바이스로 전송
+      doc["Location"] = buffer_str;
+      serializeJsonPretty(doc, mySerial);
       break;
     }
   }
