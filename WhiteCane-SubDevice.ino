@@ -9,7 +9,7 @@
 #define RST 9  // RFID RST 핀번호 지정
 #define SDA 10 // RFID SDA 핀번호 지정
 
-SoftwareSerial mySerial(2, 3) // RX, TX
+SoftwareSerial mySerial(2, 3); // RX, TX
 MFRC522 mfrc522(SDA, RST);    // MFRC522 객체 생성
 
 int detection_flag = 0; // 장애물 감지 Flag
@@ -79,7 +79,7 @@ void rfid_reader() {
     return;
   }
 
-  mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid)); // TAG에 대한 세부 정보 복사
+  mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid)); // TAG에 대한 세부 정보 출력
 
   byte buffer[18];
   block = 1;
@@ -112,8 +112,9 @@ void rfid_reader() {
       Serial.println(buffer_str);
 
       // JSON 데이터 메인 디바이스로 전송
-      doc["Location"] = buffer_str;
-      serializeJsonPretty(doc, mySerial);
+      doc["location"] = buffer_str;
+      serializeJson(doc, mySerial);
+      mySerial.write("#");
       break;
     }
   }
