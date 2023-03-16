@@ -1,5 +1,7 @@
 #include <SPI.h>
 #include <MFRC522.h>
+#include <SoftwareSerial.h>
+#include <ArduinoJson.h>
 
 #define CDS A1 // 조도센서 핀번호 지정
 #define IR 4   // 적외선 센서 핀번호 지정
@@ -7,12 +9,14 @@
 #define RST 9  // RFID RST 핀번호 지정
 #define SDA 10 // RFID SDA 핀번호 지정
 
-MFRC522 mfrc522(SDA, RST); // MFRC522 객체 생성
+SoftwareSerial mySerial(2, 3) // RX, TX
+MFRC522 mfrc522(SDA, RST);    // MFRC522 객체 생성
 
 int detection_flag = 0; // 장애물 감지 Flag
 
 void setup() {
   Serial.begin(9600);    // Initialize serial communications with the PC
+  mySerial.begin(9600);    // Initialize serial communications with the Main Device
   SPI.begin();           // Init SPI bus
   mfrc522.PCD_Init();    // Init MRFC522 card
   pinMode(IR, INPUT);    // 적외선 센서 INPUT 설정
@@ -55,6 +59,8 @@ void led_control() {
 
 // RFID TAG 읽기
 void rfid_reader() {
+  StaticJsonDocument<64> doc;   // JSON 객체 생성
+
   // 키 준비 (초기 세팅은 FFFFFFFFFFFFh로 되어 있음)
   MFRC522::MIFARE_Key key;
   for (byte i = 0; i < 6; i++) {
@@ -101,8 +107,13 @@ void rfid_reader() {
     } else {
       buffer[i] = '\0';
       buffer_str = String((char*)buffer);
+
       Serial.print("Location : ");
       Serial.println(buffer_str);
+
+      // JSON 데이터 메인 디바이스로 전송
+      doc["Location"] = buffer_str;
+      serializeJsonPretty(doc, mySerial);
       break;
     }
   }
