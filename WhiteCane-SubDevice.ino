@@ -6,6 +6,7 @@
 #define CDS A1 // 조도센서 핀번호 지정
 #define IR 4   // 적외선 센서 핀번호 지정
 #define LED 5  // LED 핀번호 지정
+#define VIB 6  // 진동 모터 핀번호 지정
 #define RST 9  // RFID RST 핀번호 지정
 #define SDA 10 // RFID SDA 핀번호 지정
 
@@ -16,11 +17,12 @@ int detection_flag = 0; // 장애물 감지 Flag
 
 void setup() {
   Serial.begin(9600);    // Initialize serial communications with the PC
-  mySerial.begin(9600);    // Initialize serial communications with the Main Device
+  mySerial.begin(9600);  // Initialize serial communications with the Main Device
   SPI.begin();           // Init SPI bus
   mfrc522.PCD_Init();    // Init MRFC522 card
   pinMode(IR, INPUT);    // 적외선 센서 INPUT 설정
-  pinMode(LED, OUTPUT);  // LED INPUT 설정
+  pinMode(LED, OUTPUT);  // LED OUTPUT 설정
+  pinMode(VIB, OUTPUT);  // 진동 모터 OUTPUT 설정
 }
 
 void loop() {
@@ -36,11 +38,13 @@ void obstacle_detection() {
   if (ir == 0) { // 장애물이 감지되었을 때
     if (detection_flag == 0) {
       detection_flag = 1;
+      analogWrite(VIB, 255); // 진동 세기 : 0~255
       Serial.println("Obstacle Detection");
     }
   } else { // 장애물이 감지되지 않었을 때
     if (detection_flag == 1) {
       detection_flag = 0;
+      analogWrite(VIB, 0);
       Serial.println("Obstacle not detected");
     }
   }
