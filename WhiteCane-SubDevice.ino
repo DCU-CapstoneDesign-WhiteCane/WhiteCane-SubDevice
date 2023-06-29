@@ -39,13 +39,13 @@ void obstacle_detection() {
     if (detection_flag == 0) {
       detection_flag = 1;
       analogWrite(VIB, 255); // 진동 세기 : 0~255
-      Serial.println("Obstacle Detection");
+      //Serial.println("Obstacle Detection");
     }
   } else { // 장애물이 감지되지 않었을 때
     if (detection_flag == 1) {
       detection_flag = 0;
       analogWrite(VIB, 0);
-      Serial.println("Obstacle not detected");
+      //Serial.println("Obstacle not detected");
     }
   }
 }
@@ -54,7 +54,7 @@ void obstacle_detection() {
 void led_control() {
   int cds = analogRead(CDS);
 
-  if (cds >= 500) {
+  if (cds >= 600) {
     digitalWrite(LED, HIGH);
   } else {
     digitalWrite(LED, LOW);
@@ -83,7 +83,7 @@ void rfid_reader() {
     return;
   }
 
-  mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid)); // TAG에 대한 세부 정보 출력
+  //mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid)); // TAG에 대한 세부 정보 출력
 
   byte buffer[18];
   block = 1;
@@ -112,13 +112,15 @@ void rfid_reader() {
       buffer[i] = '\0';
       buffer_str = String((char*)buffer);
 
-      Serial.print("Location : ");
-      Serial.println(buffer_str);
+      // Serial.print("Location : ");
+      // Serial.println(buffer_str);
 
       // JSON 데이터 메인 디바이스로 전송
       doc["location"] = buffer_str;
-      serializeJson(doc, mySerial);
-      mySerial.write("#");
+      // serializeJson(doc, mySerial);
+      // mySerial.write("#");
+      serializeJson(doc, Serial);
+      Serial.write("#");
       break;
     }
   }
